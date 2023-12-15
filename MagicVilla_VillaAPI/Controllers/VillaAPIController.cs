@@ -1,6 +1,7 @@
 ﻿using MagicVilla_VillaAPI.Data;
 using MagicVilla_VillaAPI.Models;
 using MagicVilla_VillaAPI.Models.Dto;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MagicVilla_VillaAPI.Controllers
@@ -77,11 +78,12 @@ namespace MagicVilla_VillaAPI.Controllers
             return CreatedAtRoute("GetVilla", new { id = obj.Id }, obj);
         }
 
+        
+
+        [HttpDelete("{id}",Name="DeleteVilla")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-
-        [HttpDelete("{id}",Name="DeleteVilla")]
         public IActionResult DeleteVilla(int id)
         {
             if(id==0)
@@ -100,6 +102,9 @@ namespace MagicVilla_VillaAPI.Controllers
         }
 
         [HttpPut("{id}", Name = "UpdateVilla")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
 
         public IActionResult UpdateVilla(int id, [FromBody] VillaDto obj)
         {
@@ -114,6 +119,29 @@ namespace MagicVilla_VillaAPI.Controllers
             villa.Occupancy=obj.Occupancy;
             return Ok(); 
         }
+
+        [HttpPatch("{id}",Name ="UpdatePartialVilla")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public IActionResult UpdatePartialVilla(int id,JsonPatchDocument<VillaDto> patchDTO)
+        {
+            if(patchDTO==null || id==0)
+            {
+                return BadRequest();
+            }
+            var villa = VillaStore.villalist.FirstOrDefault(u => u.Id == id);
+            if(villa==null)
+            {
+                return BadRequest();
+            }
+            patchDTO.ApplyTo(villa, ModelState);
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            return NoContent();
+        }
+
 
     }
 }

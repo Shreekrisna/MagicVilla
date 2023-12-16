@@ -11,10 +11,17 @@ namespace MagicVilla_VillaAPI.Controllers
     [ApiController]
     public class VillaAPIController : ControllerBase
     {
+        //private readonly ILogger<VillaAPIController> _logger;
+
+        //public VillaAPIController(ILogger<VillaAPIController> logger)//using Dependency Injection
+        //{
+        //    _logger = logger;
+        //}
         [HttpGet]//here httpget is the endpoint and we have to define httpget in top i.e right here
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<VillaDto>> GetVillas()
         {
+            //_logger.LogInformation("Getting all Villas");
             return Ok(VillaStore.villalist);
         }
 
@@ -34,6 +41,7 @@ namespace MagicVilla_VillaAPI.Controllers
             //Validation
             if (id == 0)
             {
+               // _logger.LogError("Get villa Error with id" + id); 
                 return BadRequest();
             }
             var villa = VillaStore.villalist.FirstOrDefault(u => u.Id == id);
